@@ -1,8 +1,11 @@
+
+
 (function() {
+  //const messageQueue = require('../../server/js/messageQueue');
 
   const serverUrl = 'http://127.0.0.1:3000';
 
-  const fetchRandomSwim = () => {
+  const fetchSwimCommand = () => {
     $.ajax({
       type: 'GET',
       url: serverUrl,
@@ -13,12 +16,28 @@
         console.log('ERROR', error);
       },
       complete: () => {
-        setTimeout(fetchRandomSwim, 5000);
+        setTimeout(fetchSwimCommand, 5000);
       }
     });
   };
-  fetchRandomSwim();
+  fetchSwimCommand();
 
+  const fetchRandomSwimCommand = () => {
+    $.ajax({
+      type: 'GET',
+      url: serverUrl,
+      success: (res) => {
+        SwimTeam.move(res);
+      },
+      error: (error) => {
+        console.log('ERROR', error);
+      },
+      complete: () => {
+        setTimeout(fetchRandomSwimCommand, 100000);
+      }
+    });
+  };
+  fetchRandomSwimCommand();
   /////////////////////////////////////////////////////////////////////
   // The ajax file uplaoder is provided for your convenience!
   // Note: remember to fix the URL below.
