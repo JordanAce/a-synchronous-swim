@@ -1,11 +1,43 @@
+
+
 (function() {
+  //const messageQueue = require('../../server/js/messageQueue');
 
   const serverUrl = 'http://127.0.0.1:3000';
 
-  //
-  // TODO: build the swim command fetcher here
-  //
+  const fetchSwimCommand = () => {
+    $.ajax({
+      type: 'GET',
+      url: serverUrl,
+      success: (res) => {
+        SwimTeam.move(res);
+      },
+      error: (error) => {
+        console.log('ERROR', error);
+      },
+      complete: () => {
+        setTimeout(fetchSwimCommand, 5000);
+      }
+    });
+  };
+  fetchSwimCommand();
 
+  const fetchRandomSwimCommand = () => {
+    $.ajax({
+      type: 'GET',
+      url: serverUrl,
+      success: (res) => {
+        SwimTeam.move(res);
+      },
+      error: (error) => {
+        console.log('ERROR', error);
+      },
+      complete: () => {
+        setTimeout(fetchRandomSwimCommand, 100000);
+      }
+    });
+  };
+  fetchRandomSwimCommand();
   /////////////////////////////////////////////////////////////////////
   // The ajax file uplaoder is provided for your convenience!
   // Note: remember to fix the URL below.
@@ -17,7 +49,7 @@
     $.ajax({
       type: 'POST',
       data: formData,
-      url: 'FILL_ME_IN',
+      url: serverUrl,
       cache: false,
       contentType: false,
       processData: false,
@@ -44,6 +76,9 @@
     }
 
     ajaxFileUplaod(file);
+
   });
 
 })();
+
+
