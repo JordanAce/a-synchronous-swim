@@ -49,7 +49,7 @@
     $.ajax({
       type: 'POST',
       data: formData,
-      url: serverUrl,
+      url: serverUrl + '/backgroundupload.jpg',
       cache: false,
       contentType: false,
       processData: false,

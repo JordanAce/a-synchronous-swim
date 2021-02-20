@@ -14,6 +14,7 @@ module.exports.backgroundImageFile = path.join('.', 'background.jpg');
 // };
 
 module.exports.router = (req, res, next = ()=>{}) => {
+
   console.log('Serving request type ' + req.method + ' for url ' + req.url);
 
   if (req.method === 'OPTIONS' && req.url === '/') {
@@ -22,35 +23,54 @@ module.exports.router = (req, res, next = ()=>{}) => {
     next();
   }
 
-  if (req.method === 'GET' && req.url === '/') {
-    let command = messageQueue.dequeue();
-    if(command) {
-      res.writeHead(200, headers);
-      res.end(command);
-      next();
-    } else {
-      res.writeHead(200, headers);
-      res.end(generateRandomCommand());
-      next();
-    }
-  }
+  if (req.method === 'POST') {
+    var jsonString = '';
+    req.on('data', (data) => {
+      jsonString+=data;
+    });
+    console.log(jsonString);
+      req.on('end', function () {
+        fs.writeFile(module.exports.backgroundImageFile, JSON.parse(jsonString), (err) => {
+          if (err) {
+            res.writeHead(404, headers);
+            res.end();
+            next();
+          }
+          console.log('Background Replaced');
+          res.writeHead(201, headers);
+          res.end();
+          next();
+        });
+      })
+    };
 
-  if (req.method === 'GET' && req.url === '/background.jpg') {
-    console.log('WE ARE GETTING IN');
-    fs.readFile(module.exports.backgroundImageFile, (err, data) => {
-      if (err) {
-        res.writeHead(404, headers);
-        res.end();
+    if (req.method === 'GET' && req.url === '/') {
+      let command = messageQueue.dequeue();
+      if(command) {
+        res.writeHead(200, headers);
+        res.end(command);
         next();
       } else {
         res.writeHead(200, headers);
-        res.end(data);
+        res.end(generateRandomCommand());
         next();
       }
-    });
+    }
 
-  }
- // invoke next() at the end of a request to help with testing!
+    if (req.method === 'GET' && req.url === '/background.jpg') {
+      fs.readFile(module.exports.backgroundImageFile, (err, data) => {
+        if (err) {
+          res.writeHead(404, headers);
+          res.end();
+          next();
+        } else {
+          res.writeHead(200, headers);
+          res.end(data);
+          next();
+        }
+      });
+    }
+
 };
 
 // helper function
